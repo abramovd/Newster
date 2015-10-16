@@ -4,13 +4,14 @@
 # Dmitry Abramov
 # Python v. 2.7.9
 
-from __future__ import division
+from __future__ import division, print_function
 import operator
 
 from structures.Graph import GraphNode, connected_components
 from structures.SuffixTree import SuffixTree
 from preprocessing.tokenize_and_stem import tokenize_and_stem
 from Scraper import Scraper, search_articles
+from config import api_urls, api_keys
 
 # global constants
 
@@ -166,17 +167,23 @@ class SuffixTreeClustering:
             self.final_clusters.append(names)
             number += 1
             
-    def print_top_clusters(self):
+    def print_clusters(self):
+        result = self.get_clusters()
+        for cluster, snippets in result.items():
+            print("cluster #%i contains documents: " % cluster, end = ' ')
+            print(snippets)
+            
+    def get_clusters(self):
+        result = {}
         count = 1
         for cluster in self.top_final_clusters:
             documents = []
-            # print(len(cluster))
             for base_cluster in cluster:
                 documents.append(set(self.cluster_document[base_cluster]))
-                #print(self.phrases[base_cluster])
-            result = frozenset().union(*documents)
-            print("cluster #%i contains documents: %s" % (count, result))
+            result[count] = list(frozenset().union(*documents))
             count += 1
+        
+        return result
     
 def F(P):
         """
@@ -196,17 +203,10 @@ def F(P):
             return beta
 
 def main():
-    
-    guardURL = 'http://content.guardianapis.com/search?'
-    nytURL = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?'
-    key_g = ' ' # insert your guardian api-key
-    key_nyt = ' ' # #insert your nyt api-key
-    
-    urls = [guardURL, nytURL]
-    keys = [key_g, key_nyt] 
+        
     query = "obama"
     
-    snippets = search_articles(urls, keys, query)
+    snippets = search_articles(api_urls, api_keys, query)
     if len(snippets) == 0:
         return
     if len(snippets) == 0:
@@ -216,7 +216,7 @@ def main():
     STC.add_strings(snippets)
     STC.find_base_clusters() # finding base clusters
     STC.find_final_clusters()
-    STC.print_top_clusters()
+    #STC.print_clusters()
 
 if __name__ == "__main__":
     main()

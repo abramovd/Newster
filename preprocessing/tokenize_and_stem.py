@@ -10,7 +10,7 @@ def tokenize_and_stem(text):
     
     w = 0
     while w < len(tokens):
-        if tokens[w].lower() in stopwords:
+        if tokens[w].lower() in stopwords or tokens[w] == "'s":
             del tokens[w]
             w -= 1
         w += 1

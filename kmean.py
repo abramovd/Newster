@@ -12,6 +12,8 @@ from Scraper import Scraper, search_articles
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
+from config import api_urls, api_keys
+
 num_clusters = 7
 
 
@@ -36,30 +38,31 @@ class kMeansClustering:
         self.clusters = km.labels_.tolist()     
         return self.clusters
         
+    def get_clusters(self):
+        result = {}
+        for i, cluster in enumerate(self.clusters):
+            if cluster + 1 not in result:
+                result[cluster + 1] = [i]
+            else:
+                result[cluster + 1].append(i)
+        return result    
+    
     def print_clusters(self):
-        for i in range(num_clusters):
-            print("cluster #%i contains documents:" % (i))
-            for j, cluster in enumerate(self.clusters):
-                if cluster == i:
-                    print(j, end=', ')
-            print('\n')
+        result = self.get_clusters()
+        for cluster, snippets in result.items():
+            print("cluster #%i contains documents: " % cluster, end = ' ')
+            print(snippets)
 
 def main():
-    guardURL = 'http://content.guardianapis.com/search?'
-    nytURL = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?'
-    key_g = ' ' # insert your guardian api-key
-    key_nyt = ' ' # #insert your nyt api-key
-    
-    urls = [guardURL, nytURL]
-    keys = [key_g, key_nyt] 
+
     query = "obama"
     
-    snippets = search_articles(urls, keys, query)
+    snippets = search_articles(api_urls, api_keys, query)
     if len(snippets) == 0:
         return
     km = kMeansClustering(snippets)
     km.find_clusters()
-    km.print_clusters()
+    #km.print_clusters()
     
 if __name__ == "__main__":
     main()
