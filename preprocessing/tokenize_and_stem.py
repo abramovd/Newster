@@ -6,6 +6,14 @@ from nltk.stem.snowball import SnowballStemmer
 import nltk
 
 def tokenize_and_stem(text):
+    """
+    Tokenizing and stemming of input text
+    Requires nltk library
+    Args:
+        text - sentence (as a string)
+    Return:
+        List of stemmed tokens
+    """
     tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
     
     w = 0

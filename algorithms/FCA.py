@@ -1,8 +1,9 @@
 from __future__ import division, print_function
-from Scraper import Scraper, search_articles
-
+import os.path, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 import copy
 
+from Scraper import Scraper, search_articles
 from fca.context import Context
 from fca.concept import Concept
 from fca.concept_lattice import ConceptLattice, compute_probability
@@ -13,6 +14,9 @@ from config import api_urls, api_keys
 max_num_of_clusters = 100
 
 class FCAClustering:
+    """
+        Clustering using Formal Concept Analysis and probability index. 
+    """
     def __init__(self, rawsnippets):
         self.snippets = []
         self.attrs = []
@@ -50,10 +54,13 @@ class FCAClustering:
         self.concept_system = self.lattice.filter_concepts(compute_probability, "abs", max_num_of_clusters)
     
     def find_clusters(self):
+        """
+        Findning clusters
+        """
         self.build_context()
         self.build_lattice()
         self.find_probabilities()
-    
+
     def get_clusters(self):
         result = {}
         cs = self.concept_system
@@ -72,7 +79,7 @@ class FCAClustering:
             if len(concept.extent) > 1:
                 result[count] = list(concept.intent)
                 count += 1
-        #print(result)
+
         return result
         
     def print_clusters(self):
@@ -83,6 +90,9 @@ class FCAClustering:
         
 
 def compute_index(lattice, function, name):
+    """
+        Computing probability index
+    """
     indexes = function(lattice)
 
     for concept in indexes.items():
@@ -94,6 +104,7 @@ def compute_index(lattice, function, name):
 if __name__ == "__main__":
 
     query = "obama"
+    
     
     snippets = search_articles(api_urls, api_keys, query)
     FC = FCAClustering(snippets)

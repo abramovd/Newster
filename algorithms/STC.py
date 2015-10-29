@@ -5,6 +5,8 @@
 # Python v. 2.7.9
 
 from __future__ import division, print_function
+import os.path, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 import operator
 
 from structures.Graph import GraphNode, connected_components
@@ -15,13 +17,15 @@ from config import api_urls, api_keys
 
 # global constants
 
-alpha = 0.5 #for base-clusters' scores computing
-beta = 0.5 # penalty constant
-k = 500 # max number of base clusters for merging
-num_of_final_clusters = 10
+ALPHA = 0.5 #for base-clusters' scores computing
+BETA = 0.5 # penalty constant
+K = 500 # max number of base clusters for merging
+NUM_OF_FINAL_CLUSTERS = 10
 
 class SuffixTreeClustering:
-    
+    """
+    Class for suffix tree clustering
+    """
     cluster_document = {} #base cluster -> documents it covers
     phrases = {} #phrases for each base cluster
     scores = {} #scores for base clusters
@@ -29,13 +33,25 @@ class SuffixTreeClustering:
     final_clusters = [] #final merged clusters
     top_final_clusters = [] #top n final clusters
 
-    def __init__(self):
+    def __init__(self, snippets = []):
+        """
+        Args:
+            snippets - list of strings where every element is a news snippet -
+            not required. You can just use it without parametrs:
+            STC = SuffixTreeClustering()
+            STC.add_strings(snippet)
+        """
         self.suffix_tree = SuffixTree()
+        if len(snippets) > 0:
+            self.add_strings(snippets)
         
     def add_strings(self, strings):
+        """
+        strings - strings (snippets) to add to suffix tree 
+        """
         for string in strings:
             if string is not None:
-            	self.suffix_tree.append_string(tokenize_and_stem(string))
+                self.suffix_tree.append_string(tokenize_and_stem(string))
         self.suffix_tree.fix_input_string()
 
     def find_base_clusters(self, node = None):
@@ -73,41 +89,7 @@ class SuffixTreeClustering:
                 else:
                     self.cluster_document[node.parent.identifier].append(node.bit_vector)
         return
-    
-    def find_final_clusters(self):
-        self.count_scores() # computing scores of each base claster
-        # sorting base clusters by scores
-        sorted_scores = sorted(self.scores.items(), key=operator.itemgetter(1), reverse=1)
-        #print(len(sorted_scores))
-        n = min(k, len(sorted_scores)) # number of selected top scored base clusters
-
-        #selecting
-        for i in range(n):
-            self.sorted_clusters.append(sorted_scores[i][0])
-        #print('sorted base clus yes')
-        # computing Similarity matrix for selected clusters
-        Sim = self.similarity(self.sorted_clusters)
         
-        self.merge_clusters(Sim)
-        # final clusters - result of merging
-
-        # computing final scores for final clusters
-        final_scores = {}
-
-        for final_cluster_index in range(len(self.final_clusters)):
-            sum = 0
-            for base_cluster_index in range(len(self.final_clusters[final_cluster_index])):
-                sum += self.scores[self.final_clusters[final_cluster_index][base_cluster_index]]
-            final_scores[final_cluster_index] = sum
-
-        sorted_final_scores = sorted(final_scores.items(), key=operator.itemgetter(1), reverse=1)
-
-        # selecting top final clusters, the number of selecting is num_of_final_clusters = 10
-    
-        n = min(num_of_final_clusters, len(self.final_clusters))
-        for cluster in range(n):
-            self.top_final_clusters.append(self.final_clusters[sorted_final_scores[cluster][0]])
-    
     def count_scores(self):
         """
         Count scores for base clusters
@@ -119,12 +101,11 @@ class SuffixTreeClustering:
         for cluster in self.phrases.keys():
             self.scores[cluster] = len(self.cluster_document[cluster])*F(len(self.phrases[cluster].split(' ')))
         return
-
     def similarity(self, base_clusters):
         """
         Compute Similarity Matrix
         Args:
-            base_clusters - top (<= k = 500)sorted by score base clusters
+            base_clusters - top (<= k = 500) sorted by score base clusters
         Return:
             Similarity Matrix of clusters
         """
@@ -136,7 +117,7 @@ class SuffixTreeClustering:
              B1 = self.cluster_document[base_clusters[i]]
              B2 = self.cluster_document[base_clusters[j]]
              intersec = set(B1).intersection(B2) # intersection of two clusters (common covered documents)
-             if len(intersec) / len(B1) > alpha and len(intersec) / len(B2) > alpha:
+             if len(intersec) / len(B1) > ALPHA and len(intersec) / len(B2) > ALPHA:
                 Sim[i][j] = 1
                 Sim[j][i] = 1 #not important
         return Sim
@@ -166,6 +147,47 @@ class SuffixTreeClustering:
             names = sorted(node.name for node in components)
             self.final_clusters.append(names)
             number += 1
+    
+    def find_final_clusters(self, number_of_clusters = NUM_OF_FINAL_CLUSTERS):
+        """
+        Findning final clusters
+        Args:
+            number_of_clusters - max number of final clusters
+            default number of clusters = NUM_OF_FINAL_CLUSTERS = 10
+        """
+        if len(self.scores.keys()) == 0:
+            self.find_base_clusters()
+        self.count_scores() # computing scores of each base claster
+        # sorting base clusters by scores
+        sorted_scores = sorted(self.scores.items(), key=operator.itemgetter(1), reverse=1)
+        #print(len(sorted_scores))
+        n = min(K, len(sorted_scores)) # number of selected top scored base clusters
+
+        #selecting
+        for i in range(n):
+            self.sorted_clusters.append(sorted_scores[i][0])
+        # computing Similarity matrix for selected clusters
+        Sim = self.similarity(self.sorted_clusters)
+        
+        self.merge_clusters(Sim)
+        # final clusters - result of merging
+
+        # computing final scores for final clusters
+        final_scores = {}
+
+        for final_cluster_index in range(len(self.final_clusters)):
+            sum = 0
+            for base_cluster_index in range(len(self.final_clusters[final_cluster_index])):
+                sum += self.scores[self.final_clusters[final_cluster_index][base_cluster_index]]
+            final_scores[final_cluster_index] = sum
+
+        sorted_final_scores = sorted(final_scores.items(), key=operator.itemgetter(1), reverse=1)
+
+        # selecting top final clusters, the number of selecting is num_of_final_clusters = 10
+    
+        n = min(number_of_clusters, len(self.final_clusters))
+        for cluster in range(n):
+            self.top_final_clusters.append(self.final_clusters[sorted_final_scores[cluster][0]])
             
     def print_clusters(self):
         result = self.get_clusters()
@@ -200,7 +222,7 @@ def F(P):
         elif P >= 2 and P <= 6:
             return P
         else:
-            return beta
+            return BETA
 
 def main():
         
@@ -208,13 +230,12 @@ def main():
     
     snippets = search_articles(api_urls, api_keys, query)
     if len(snippets) == 0:
-        return
-    if len(snippets) == 0:
         print("Sorry, no results for your query!")
         return
-    STC = SuffixTreeClustering()
+
+    STC = SuffixTreeClustering(snippets)
     STC.add_strings(snippets)
-    STC.find_base_clusters() # finding base clusters
+    #STC.find_base_clusters() # finding base clusters
     STC.find_final_clusters()
     #STC.print_clusters()
 

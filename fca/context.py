@@ -246,8 +246,6 @@ class Context(object):
     def __getitem__(self, key):
         return self._table[key]
 
-    ############################
-
     def __repr__(self):
         output = ", ".join(self.attributes) + "\n"
         output += ", ".join(self.objects) + "\n"

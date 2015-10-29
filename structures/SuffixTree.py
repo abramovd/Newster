@@ -228,10 +228,6 @@ class SuffixTree:
         if node.bit_vector == 2 ** self.strings_count - 1:
             output += ',style="filled",fillcolor="red"'
         output += '];'
-    #    if node.suffix_link is not None:
-    #        output += str(node.identifier) + '->' + str(node.suffix_link.identifier) + '[style="dashed"];'
-        #for c in node.edges.values():
-    #   print(len(node.edges.values()))
 
         for edge, child in node.edges.items():
             child = node.edges[edge]
