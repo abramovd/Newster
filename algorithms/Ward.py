@@ -30,7 +30,11 @@ class HierarchicalClustering:
         self.snippets = snippets
         self.clusters = []
     
-    def find_clusters(self, num_of_clusters = NUMBER_OF_CLUSTERS):
+    def find_clusters(self, n_clusters = NUMBER_OF_CLUSTERS):
+    
+        if len(self.snippets) < n_clusters:
+            print("Sorry, but number of snippets should be >= number of clusters")
+            return
         #define vectorizer parameters
         tfidf_vectorizer = TfidfVectorizer(max_df=0.999, max_features=200000,
                                  min_df=0.001, stop_words='english',
@@ -40,9 +44,9 @@ class HierarchicalClustering:
 
         dist = 1 - cosine_similarity(tfidf_matrix)
     
-        ward = AgglomerativeClustering(n_clusters = num_of_clusters, linkage = 'ward').fit(dist)
+        ward = AgglomerativeClustering(n_clusters = n_clusters, linkage = 'ward').fit(dist)
         self.clusters = ward.labels_
-        return self.clusters
+        return self.get_clusters()
     
     def get_clusters(self):
         result = {}

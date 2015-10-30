@@ -11,7 +11,7 @@ from fca.ConceptSystem import ConceptSystem
 from preprocessing.tokenize_and_stem import tokenize_and_stem
 from config import api_urls, api_keys
 
-max_num_of_clusters = 100
+MAX_NUM_OF_CLUSTERS = 10
 
 class FCAClustering:
     """
@@ -43,37 +43,45 @@ class FCAClustering:
                 if word in snippet:
                     context[i][j] = True
     
-        self.objs = [str(i) for i in range(0,len(snippets))]
+        self.objs = [str(i) for i in range(0,len(self.snippets))]
         self.context = Context(context, self.objs, self.attrs)
     
     def build_lattice(self):
         if self.context is not None:
             self.lattice = ConceptLattice(self.context)
             
-    def find_probabilities(self):
-        self.concept_system = self.lattice.filter_concepts(compute_probability, "abs", max_num_of_clusters)
+    def find_probabilities(self, n_clusters = MAX_NUM_OF_CLUSTERS):
+        self.concept_system = self.lattice.filter_concepts(compute_probability, "abs", len(self.snippets) + n_clusters)
     
-    def find_clusters(self):
+    def find_clusters(self, n_clusters = MAX_NUM_OF_CLUSTERS):
         """
         Findning clusters
         """
+        if len(self.snippets) < n_clusters:
+            print("Sorry, but number of snippets should be >= number of clusters")
+            return {}
         self.build_context()
         self.build_lattice()
-        self.find_probabilities()
+        self.find_probabilities(n_clusters)
+        return self.get_clusters()
 
     def get_clusters(self):
         result = {}
         cs = self.concept_system
+        if cs == None:
+            return {}
         count = 1
         for concept in cs._concepts:
             if len(concept.extent) > 1:
-                result[count] = list(concept.extent)
+                result[count] = [int(elem) for elem in concept.extent]
                 count += 1
         return result
         
     def get_common_words(self):
         result = {}
         cs = self.concept_system
+        if cs == None:
+            return {}
         count = 1
         for concept in cs._concepts:
             if len(concept.extent) > 1:
@@ -109,4 +117,4 @@ if __name__ == "__main__":
     snippets = search_articles(api_urls, api_keys, query)
     FC = FCAClustering(snippets)
     FC.find_clusters()
-    #FC.print_clusters()
+    FC.print_clusters()

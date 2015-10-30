@@ -45,9 +45,15 @@ class Scraper:
         if self.URL.find('nytimes') != -1:
             if len(self.json) > 0:
                 return self.json[0].keys()
+            else:
+                print("Sorry, no result for your query on The NY Times")
+                return []
         elif self.URL.find('guard') != -1:
             if len(self.json) > 0:
                 return self.json[0].keys()
+            else:
+                print("Sorry, no result for your query on The Guardian")
+                return []
     
     def show_result_by_fields(self, fields):
         """

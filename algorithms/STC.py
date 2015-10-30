@@ -41,6 +41,7 @@ class SuffixTreeClustering:
             STC = SuffixTreeClustering()
             STC.add_strings(snippet)
         """
+        self.snippets = snippets
         self.suffix_tree = SuffixTree()
         if len(snippets) > 0:
             self.add_strings(snippets)
@@ -155,6 +156,10 @@ class SuffixTreeClustering:
             number_of_clusters - max number of final clusters
             default number of clusters = NUM_OF_FINAL_CLUSTERS = 10
         """
+        if len(self.snippets) < number_of_clusters:
+            print("Sorry, but number of snippets should be >= number of clusters")
+            return {}
+         
         if len(self.scores.keys()) == 0:
             self.find_base_clusters()
         self.count_scores() # computing scores of each base claster
@@ -188,6 +193,8 @@ class SuffixTreeClustering:
         n = min(number_of_clusters, len(self.final_clusters))
         for cluster in range(n):
             self.top_final_clusters.append(self.final_clusters[sorted_final_scores[cluster][0]])
+            
+        return self.get_clusters()
             
     def print_clusters(self):
         result = self.get_clusters()
@@ -234,7 +241,7 @@ def main():
         return
 
     STC = SuffixTreeClustering(snippets)
-    STC.add_strings(snippets)
+    #STC.add_strings(snippets)
     #STC.find_base_clusters() # finding base clusters
     STC.find_final_clusters()
     #STC.print_clusters()

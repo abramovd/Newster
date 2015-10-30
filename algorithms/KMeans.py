@@ -18,8 +18,7 @@ from sklearn.cluster import KMeans
 
 from config import api_urls, api_keys
 
-num_clusters = 7
-
+NUM_OF_CLUSTERS = 7
 
 class kMeansClustering:
     """
@@ -34,11 +33,14 @@ class kMeansClustering:
         self.snippets = snippets
         self.clusters = []
     
-    def find_clusters(self):
+    def find_clusters(self, n_clusters = NUM_OF_CLUSTERS):
         """
         Finding clusters.
         Requires sklearn library.
         """
+        if len(self.snippets) < n_clusters:
+            print("Sorry, but number of snippets should be >= number of clusters")
+            return {}
     
         #define vectorizer parameters
         tfidf_vectorizer = TfidfVectorizer(max_df=0.999, max_features=200000,
@@ -48,11 +50,11 @@ class kMeansClustering:
         terms = tfidf_vectorizer.get_feature_names()
         matrix = tfidf_matrix.todense()
 
-        km = KMeans(n_clusters=num_clusters)
+        km = KMeans(n_clusters = n_clusters)
         km.fit(tfidf_matrix)
         
         self.clusters = km.labels_.tolist()     
-        return self.clusters
+        return self.get_clusters()
         
     def get_clusters(self):
         """
@@ -84,7 +86,7 @@ def main():
         return
     km = kMeansClustering(snippets)
     km.find_clusters()
-    #km.print_clusters()
+    km.print_clusters()
     
 if __name__ == "__main__":
     main()
