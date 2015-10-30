@@ -3,7 +3,10 @@
 
 from __future__ import division, print_function
 import json
-import urllib2
+try:
+    import urllib.request as urllib2
+except ImportError:
+    import urllib2
 
 class Scraper:
     """
@@ -23,7 +26,8 @@ class Scraper:
         self.URL += query + self.API_key
         
         try:
-            jstrs = urllib2.urlopen(self.URL).read().strip('()')
+            jstrs = urllib2.urlopen(self.URL).read()
+            jstrs = jstrs.decode('utf-8').strip('()')
         except urllib2.URLError:
             print("Sorry. Your URL or API-key is invalid")
             return urllib2.URLError

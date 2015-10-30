@@ -1,5 +1,6 @@
-from LatticBuild import norris
-from ConceptSystem import ConceptSystem
+from fca.LatticeBuild import norris
+from fca.ConceptSystem import ConceptSystem
+from functools import cmp_to_key
 
 class ConceptLattice(object):
     """ConceptLattice class
@@ -99,8 +100,10 @@ class ConceptLattice(object):
             return ConceptSystem([c[0] for c in filtered_concepts])
 
         def _filter_abs(self, indexes, n):
+            def cmp(a, b):
+                return (a > b) - (a < b) 
             cmp_ = lambda x,y: cmp(x[1], y[1])
-            sorted_indexes = sorted(indexes.items(), cmp_, reverse=False)
+            sorted_indexes = sorted(indexes.items(), key=cmp_to_key(cmp_), reverse=False)
             filtered_concepts = sorted_indexes[:int(n)]
 
             return ConceptSystem([c[0] for c in filtered_concepts])

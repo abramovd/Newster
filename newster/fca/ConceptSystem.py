@@ -79,11 +79,11 @@ class ConceptSystem(object):
         cs = self
         parents = dict([(c, set()) for c in cs])
 
-        for i in xrange(len(cs)):
-            for j in xrange(len(cs)):
+        for i in range(len(cs)):
+            for j in range(len(cs)):
                 if cs[i].intent < cs[j].intent:
                     parents[cs[j]].add(cs[i])
-                    for k in xrange(len(cs)):
+                    for k in range(len(cs)):
                         if cs[i].intent < cs[k].intent and\
                            cs[k].intent < cs[j].intent:
                                 parents[cs[j]].remove(cs[i])

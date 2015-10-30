@@ -1,6 +1,8 @@
-import sys
-
-END_OF_STRING = sys.maxint
+try:
+    import sys
+    END_OF_STRING = sys.maxint
+except:
+    END_OF_STRING = sys.maxsize
 
 class SuffixTreeNode:
     """
@@ -8,7 +10,7 @@ class SuffixTreeNode:
     """
     new_identifier = 0
 
-    def __init__(self, start=0, end=END_OF_STRING):
+    def __init__(self, start=0, end = END_OF_STRING):
         self.identifier = SuffixTreeNode.new_identifier
         SuffixTreeNode.new_identifier += 1
 

@@ -11,7 +11,7 @@ def norris(context):
         examples.append(ex)
 
     cs = [Concept([], context.attributes)]
-    for i in xrange(len(context)):
+    for i in range(len(context)):
         # TODO:
         cs_for_loop = cs[:]
         for c in cs_for_loop:
@@ -20,7 +20,7 @@ def norris(context):
             else:
                 new_intent = c.intent & examples[i]
                 new = True
-                for j in xrange(i):
+                for j in range(i):
                     if new_intent.issubset(examples[j]) and\
                        context.objects[j] not in c.extent:
                         new = False
