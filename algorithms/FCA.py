@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8
+
+# Dmitry Abramov
+# Python v. 2.7.9
+
 from __future__ import division, print_function
 import os.path, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))

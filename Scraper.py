@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8
+
 from __future__ import division, print_function
 import json
 import urllib2
@@ -18,7 +19,7 @@ class Scraper:
         Args:
             query - string
         """
-        query = 'q=' + query
+        query = 'q=' + self.fix_query(query)
         self.URL += query + self.API_key
         
         try:
@@ -35,6 +36,9 @@ class Scraper:
         elif self.URL.find('guard') != -1:
             self.json = self.json['results']
             return self.json
+            
+    def fix_query(self, query):
+        return '+'.join(query.split(' '))
             
     def fields(self):
         """
