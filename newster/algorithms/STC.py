@@ -12,7 +12,7 @@ import operator
 from structures.Graph import GraphNode, connected_components
 from structures.SuffixTree import SuffixTree
 from preprocessing.tokenize_and_stem import tokenize_and_stem
-from Scraper import Scraper, search_articles
+from scraper import Scraper, search_articles
 from config import api_urls, api_keys
 
 # global constants
@@ -149,7 +149,7 @@ class SuffixTreeClustering:
             self.final_clusters.append(names)
             number += 1
     
-    def find_final_clusters(self, number_of_clusters = NUM_OF_FINAL_CLUSTERS):
+    def find_clusters(self, number_of_clusters = NUM_OF_FINAL_CLUSTERS):
         """
         Findning final clusters
         Args:
@@ -235,7 +235,7 @@ def main():
         
     query = "obama"
     
-    snippets = search_articles(api_urls, api_keys, query)
+    snippets = search_articles(api_urls, api_keys, query)['snippets']
     if len(snippets) == 0:
         print("Sorry, no results for your query!")
         return
@@ -243,8 +243,8 @@ def main():
     STC = SuffixTreeClustering(snippets)
     #STC.add_strings(snippets)
     #STC.find_base_clusters() # finding base clusters
-    STC.find_final_clusters()
-    #STC.print_clusters()
+    STC.find_clusters()
+    STC.print_clusters()
 
 if __name__ == "__main__":
     main()

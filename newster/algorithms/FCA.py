@@ -9,7 +9,7 @@ import os.path, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 import copy
 
-from Scraper import Scraper, search_articles
+from scraper import Scraper, search_articles
 from fca.context import Context
 from fca.concept import Concept
 from fca.concept_lattice import ConceptLattice, compute_probability
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     query = "obama"
     
     
-    snippets = search_articles(api_urls, api_keys, query)
+    snippets = search_articles(api_urls, api_keys, query)['snippets']
     FC = FCAClustering(snippets)
     FC.find_clusters()
     FC.print_clusters()
