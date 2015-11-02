@@ -16,7 +16,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_similarity
 
-from config import api_urls, api_keys
+#from config import api_urls, api_keys
 
 # global constants
 NUMBER_OF_CLUSTERS = 7

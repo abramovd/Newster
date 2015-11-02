@@ -15,7 +15,7 @@ from fca.concept import Concept
 from fca.concept_lattice import ConceptLattice, compute_probability
 from fca.ConceptSystem import ConceptSystem
 from preprocessing.tokenize_and_stem import tokenize_and_stem
-from config import api_urls, api_keys
+#from config import api_urls, api_keys
 
 MAX_NUM_OF_CLUSTERS = 10
 

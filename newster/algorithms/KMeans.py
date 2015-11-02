@@ -16,7 +16,7 @@ from scraper import Scraper, search_articles
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
-from config import api_urls, api_keys
+#from config import api_urls, api_keys
 
 NUM_OF_CLUSTERS = 7
 

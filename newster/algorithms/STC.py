@@ -13,7 +13,7 @@ from structures.Graph import GraphNode, connected_components
 from structures.SuffixTree import SuffixTree
 from preprocessing.tokenize_and_stem import tokenize_and_stem
 from scraper import Scraper, search_articles
-from config import api_urls, api_keys
+#from config import api_urls, api_keys
 
 # global constants
 
