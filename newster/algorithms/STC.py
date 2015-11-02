@@ -129,6 +129,7 @@ class SuffixTreeClustering:
         Args:
             Sim - matrix of similarity between base clusters
         """
+        self.final_clusters = []
 
         node_names = {} # dictionary ["name of base cluster"] = GraphNode
         for i in range(len(Sim)):
