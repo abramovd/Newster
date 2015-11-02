@@ -130,7 +130,7 @@ def search_articles(URLs, keys, query):
                 return {'snippets': [], 'sources': [], 'links': [], 'titles': []}
             if URLs[i].find('nytimes') != -1:
                 c = 'snippet'
-                result['links'] += scrapers[i].get_result_by_field('source')
+                result['links'] += scrapers[i].get_result_by_field('web_url')
                 titles = scrapers[i].get_result_by_field('headline')
                 result['titles'] += [title['main'] for title in titles]
                 result['sources'] += ['NYT'] * len(scrapers[i].get_result_by_field('source'))
@@ -148,7 +148,7 @@ def search_articles(URLs, keys, query):
         if scraper.search(query) != urllib2.URLError:
             if URLs[i].find('nytimes') != -1:
                 c = 'snippet'
-                result['links'] += scraper.get_result_by_field('source')
+                result['links'] += scraper.get_result_by_field('web_url')
                 titles = scraper.get_result_by_field('headline')
                 result['titles'] += [title['main'] for title in titles]
                 result['sources'] += ['NYT'] * len(scraper.get_result_by_field('source'))

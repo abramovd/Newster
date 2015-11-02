@@ -116,9 +116,10 @@ class Newster:
     
 
 def main():
-    query = "Ebola"
+    query = "Obama"
     newster = Newster(api_urls, api_keys, query)
-    newster.print_search_results()
+    #newster.print_search_results()
+    #newster.print_links()
     if len(newster.get_snippets()) > 0:
         print("--------------STC---------------")
         newster.find_clusters(method = "stc2", n_clusters = 6)
