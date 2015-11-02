@@ -13,14 +13,14 @@ from structures.Graph import GraphNode, connected_components
 from structures.SuffixTree import SuffixTree
 from preprocessing.tokenize_and_stem import tokenize_and_stem
 from scraper import Scraper, search_articles
-#from config import api_urls, api_keys
+from config import api_urls, api_keys
 
 # global constants
 
 ALPHA = 0.5 #for base-clusters' scores computing
 BETA = 0.5 # penalty constant
 K = 500 # max number of base clusters for merging
-NUM_OF_FINAL_CLUSTERS = 10
+NUM_OF_FINAL_CLUSTERS = 7
 
 class SuffixTreeClustering:
     """
@@ -159,9 +159,11 @@ class SuffixTreeClustering:
         if len(self.snippets) < number_of_clusters:
             print("Sorry, but number of snippets should be >= number of clusters")
             return {}
-         
-        if len(self.scores.keys()) == 0:
-            self.find_base_clusters()
+        
+        self.sorted_clusters = []
+        self.phrases = {}
+        self.clusters_document = {}
+        self.find_base_clusters()
         self.count_scores() # computing scores of each base claster
         # sorting base clusters by scores
         sorted_scores = sorted(self.scores.items(), key=operator.itemgetter(1), reverse=1)
@@ -189,7 +191,8 @@ class SuffixTreeClustering:
         sorted_final_scores = sorted(final_scores.items(), key=operator.itemgetter(1), reverse=1)
 
         # selecting top final clusters, the number of selecting is num_of_final_clusters = 10
-    
+     
+        self.top_final_clusters = []
         n = min(number_of_clusters, len(self.final_clusters))
         for cluster in range(n):
             self.top_final_clusters.append(self.final_clusters[sorted_final_scores[cluster][0]])

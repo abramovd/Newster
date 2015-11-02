@@ -122,7 +122,7 @@ def main():
     #newster.print_links()
     if len(newster.get_snippets()) > 0:
         print("--------------STC---------------")
-        newster.find_clusters(method = "stc2", n_clusters = 6)
+        newster.find_clusters(method = "stc", n_clusters = 6)
         newster.print_clusters()
         print("--------------FCA---------------")
         newster.find_clusters(method = "fca", n_clusters = 10)
