@@ -32,6 +32,7 @@ class FCAClustering:
         self.lattice = None
         self.concept_system = None
         
+        self.rawsnippets = rawsnippets
         count = 0
         for snippet in rawsnippets:
             self.snippets.append(tokenize_and_stem(snippet))
@@ -83,18 +84,41 @@ class FCAClustering:
                 count += 1
         return result
         
-    def get_common_words(self):
-        result = {}
+    def get_common_phrases(self, num = 2):
+
+        def restemming(word, num_snippets):
+            for num_snippet in num_snippets:
+                tokenized_snippet = tokenize_and_stem(self.rawsnippets[num_snippet], stem = 0)
+                for sn in tokenized_snippet:
+                    if sn.find(word) != -1:
+                        return sn
+            return ''
+    
+        phrases = {}
         cs = self.concept_system
         if cs == None:
             return {}
         count = 1
         for concept in cs._concepts:
             if len(concept.extent) > 1:
-                result[count] = list(concept.intent)
+                extent = [int(x) for x in list(concept.extent)]
+                intent = list(concept.intent)
+                for i in range(len(intent)):
+                    if count not in phrases:
+                        phrases[count] = []
+                    restem = restemming(intent[i], extent)
+                    if restem != '':
+                        if len(phrases[count]) < num:
+                            phrases[count].append(restem)
                 count += 1
-
-        return result
+        return phrases
+    
+    def print_common_phrases(self, num = 2):         
+        
+        result = self.get_common_phrases(num = num)
+        for cluster, phrases in result.items():
+            print("cluster #%i tags: " % cluster, end = ' ')
+            print(phrases)
         
     def print_clusters(self):
         result = self.get_clusters()
@@ -124,3 +148,4 @@ if __name__ == "__main__":
     FC = FCAClustering(snippets)
     FC.find_clusters()
     FC.print_clusters()
+    FC.print_common_phrases()

@@ -228,7 +228,8 @@ class SuffixTreeClustering:
                 for sn in tokenized_snippet:
                     if sn.find(word) != -1:
                         return sn
-            return ''   
+            return ''
+ 
         phrases = {}
         for i in range(len(self.get_clusters().keys())):
             for phrase in self.top_final_phrases[i + 1]:

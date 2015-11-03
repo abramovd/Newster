@@ -75,7 +75,8 @@ class kMeansClustering:
                     phrases[i + 1] = []
                 restem = restemming(self.terms[ind], self.get_clusters()[i + 1])
                 if restem != '':
-                    phrases[i + 1].append(restem)
+                    if len(phrases[i + 1]) < num:
+                        phrases[i + 1].append(restem)
         return phrases
 
     def print_common_phrases(self, num = 2):         
