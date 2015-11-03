@@ -20,18 +20,12 @@ from scraper import Scraper, search_articles
 ALPHA = 0.5 #for base-clusters' scores computing
 BETA = 0.5 # penalty constant
 K = 500 # max number of base clusters for merging
-NUM_OF_FINAL_CLUSTERS = 7
+NUM_OF_FINAL_CLUSTERS = 10
 
 class SuffixTreeClustering:
     """
     Class for suffix tree clustering
     """
-    cluster_document = {} #base cluster -> documents it covers
-    phrases = {} #phrases for each base cluster
-    scores = {} #scores for base clusters
-    sorted_clusters = [] #sorted base-clusters by the scores
-    final_clusters = [] #final merged clusters
-    top_final_clusters = [] #top n final clusters
 
     def __init__(self, snippets = []):
         """
@@ -42,6 +36,14 @@ class SuffixTreeClustering:
             STC.add_strings(snippet)
         """
         self.snippets = snippets
+        self.final_phrases = {}
+        self.cluster_document = {} #base cluster -> documents it covers
+        self.phrases = {} #phrases for each base cluster
+        self.scores = {} #scores for base clusters
+        self.sorted_clusters = [] #sorted base-clusters by the scores
+        self.final_clusters = [] #final merged clusters
+        self.top_final_clusters = [] #top n final clusters
+        
         self.suffix_tree = SuffixTree()
         if len(snippets) > 0:
             self.add_strings(snippets)
@@ -129,7 +131,6 @@ class SuffixTreeClustering:
         Args:
             Sim - matrix of similarity between base clusters
         """
-        self.final_clusters = []
 
         node_names = {} # dictionary ["name of base cluster"] = GraphNode
         for i in range(len(Sim)):
@@ -162,10 +163,11 @@ class SuffixTreeClustering:
             return {}
         
         self.sorted_clusters = []
-        self.phrases = {}
         self.clusters_document = {}
         self.find_base_clusters()
         self.count_scores() # computing scores of each base claster
+        self.final_clusters = []
+        self.final_phrases = {}
         # sorting base clusters by scores
         sorted_scores = sorted(self.scores.items(), key=operator.itemgetter(1), reverse=1)
         #print(len(sorted_scores))
@@ -179,27 +181,77 @@ class SuffixTreeClustering:
         
         self.merge_clusters(Sim)
         # final clusters - result of merging
-
+        
         # computing final scores for final clusters
         final_scores = {}
 
         for final_cluster_index in range(len(self.final_clusters)):
             sum = 0
-            for base_cluster_index in range(len(self.final_clusters[final_cluster_index])):
-                sum += self.scores[self.final_clusters[final_cluster_index][base_cluster_index]]
+            for base_cluster in self.final_clusters[final_cluster_index]:
+                if type(base_cluster) is list:
+                    for cluster in base_cluster:
+                        sum += self.scores[cluster]
+                else:
+                    sum += self.scores[base_cluster]
+                if final_cluster_index not in self.final_phrases:
+                    self.final_phrases[final_cluster_index] = []
+                
+                if type(base_cluster) is list:
+                    for cluster in base_cluster:
+                        self.final_phrases[final_cluster_index].append(self.phrases[cluster])
+                else:
+                    self.final_phrases[final_cluster_index].append(self.phrases[base_cluster])
+            
             final_scores[final_cluster_index] = sum
 
         sorted_final_scores = sorted(final_scores.items(), key=operator.itemgetter(1), reverse=1)
-
+        
         # selecting top final clusters, the number of selecting is num_of_final_clusters = 10
      
         self.top_final_clusters = []
+        self.top_final_phrases = {}
         n = min(number_of_clusters, len(self.final_clusters))
+        self.n_goodclusters = 0
         for cluster in range(n):
             self.top_final_clusters.append(self.final_clusters[sorted_final_scores[cluster][0]])
-            
+            if sorted_final_scores[cluster][1] > 0:
+                self.n_goodclusters += 1
+            self.top_final_phrases[cluster + 1] = self.final_phrases[sorted_final_scores[cluster][0]]
+        
         return self.get_clusters()
+       
+    def get_common_phrases(self, num = 2):           
+        
+        def restemming(word, num_snippets):
+            for num_snippet in num_snippets:
+                tokenized_snippet = tokenize_and_stem(self.snippets[num_snippet], stem = 0)
+                for sn in tokenized_snippet:
+                    if sn.find(word) != -1:
+                        return sn
+            return ''   
+        phrases = {}
+        for i in range(len(self.get_clusters().keys())):
+            for phrase in self.top_final_phrases[i + 1]:
+                if i + 1 not in phrases:
+                    phrases[i + 1] = []
+                words = phrase.split(' ')
+                for word in words:
+                    restem = restemming(word, self.get_clusters()[i + 1])
+                    if restem != '':
+                        if len(phrases[i + 1]) < num:
+                            phrases[i + 1].append(restem)
+        return phrases
+
+    def print_common_phrases(self, num = 2):         
+        
+        result = self.get_common_phrases(num = num)
+        for cluster, phrases in result.items():
+            print("cluster #%i tags: " % cluster, end = ' ')
+            print(phrases)
             
+    def get_number_of_good_clusters(self):
+        return self.n_goodclusters
+    
     def print_clusters(self):
         result = self.get_clusters()
         for cluster, snippets in result.items():
@@ -237,7 +289,7 @@ def F(P):
 
 def main():
         
-    query = "obama"
+    query = "putin"
     
     snippets = search_articles(api_urls, api_keys, query)['snippets']
     if len(snippets) == 0:
@@ -249,6 +301,6 @@ def main():
     #STC.find_base_clusters() # finding base clusters
     STC.find_clusters()
     STC.print_clusters()
-
+    STC.print_common_phrases(2)
 if __name__ == "__main__":
     main()

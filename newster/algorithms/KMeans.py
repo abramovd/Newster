@@ -53,9 +53,38 @@ class kMeansClustering:
         km = KMeans(n_clusters = n_clusters)
         km.fit(tfidf_matrix)
         
-        self.clusters = km.labels_.tolist()     
-        return self.get_clusters()
+        self.clusters = km.labels_.tolist()
+        self.order_centroids = km.cluster_centers_.argsort()[:, ::-1]
+        self.terms = tfidf_vectorizer.get_feature_names()
         
+        return self.get_clusters()
+
+    def get_common_phrases(self, num = 2):
+        def restemming(word, num_snippets):
+            for num_snippet in num_snippets:
+                tokenized_snippet = tokenize_and_stem(self.snippets[num_snippet], stem = 0)
+                for sn in tokenized_snippet:
+                    if sn.find(word) != -1:
+                        return sn
+            return ''       
+
+        phrases = {}
+        for i in range(len(self.get_clusters().keys())):
+            for ind in self.order_centroids[i, :num]:
+                if i + 1 not in phrases:
+                    phrases[i + 1] = []
+                restem = restemming(self.terms[ind], self.get_clusters()[i + 1])
+                if restem != '':
+                    phrases[i + 1].append(restem)
+        return phrases
+
+    def print_common_phrases(self, num = 2):         
+        
+        result = self.get_common_phrases(num = num)
+        for cluster, phrases in result.items():
+            print("cluster #%i tags: " % cluster, end = ' ')
+            print(phrases)
+   
     def get_clusters(self):
         """
         Return:
@@ -84,9 +113,11 @@ def main():
     snippets = search_articles(api_urls, api_keys, query)['snippets']
     if len(snippets) == 0:
         return
+
     km = kMeansClustering(snippets)
     km.find_clusters()
     km.print_clusters()
+    km.print_common_phrases()
     
 if __name__ == "__main__":
     main()

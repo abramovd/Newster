@@ -5,7 +5,7 @@ from nltk.stem.lancaster import LancasterStemmer
 from nltk.stem.snowball import SnowballStemmer
 import nltk
 
-def tokenize_and_stem(text):
+def tokenize_and_stem(text, stem = 1):
     """
     Tokenizing and stemming of input text
     Requires nltk library
@@ -28,10 +28,13 @@ def tokenize_and_stem(text):
 
     for token in tokens:
         if re.search('[a-zA-Z]', token):
-            filtered_tokens.append(token)
+            filtered_tokens.append(token.lower())
 
-    stems = [stemmer.stem(t) for t in filtered_tokens]
-    return stems
+    if stem:
+        stems = [stemmer.stem(t) for t in filtered_tokens]
+        return stems
+    else:
+        return filtered_tokens
 
 stopwords = nltk.corpus.stopwords.words('english')
 stemmer = SnowballStemmer("english")
