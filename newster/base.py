@@ -36,6 +36,7 @@ class Newster:
         return self.snippets
             
     def find_clusters(self, method, n_clusters = NUM_OF_CLUSTERS):
+        self.method = method
         if len(self.snippets) == 0:
             print("Sorry. There is nothing to cluster. Firstly, search for something.")
             return
@@ -109,6 +110,13 @@ class Newster:
             return self.clustering.get_clusters()
         else:
             return {}
+
+    def get_common_tags(self, num = 2):
+        return self.clustering.get_common_phrases(num)
+    
+    def get_number_of_good_clusters(self):
+        if self.method == 'stc':
+            return self.clustering.get_number_of_good_clusters()
     
     def print_clusters(self):
         if self.clustering:
@@ -124,12 +132,15 @@ def main():
         print("--------------STC---------------")
         newster.find_clusters(method = "stc", n_clusters = 6)
         newster.print_clusters()
+        print(newster.get_common_tags())
         print("--------------FCA---------------")
         newster.find_clusters(method = "fca", n_clusters = 10)
         newster.print_clusters()
+        print(newster.get_common_tags())
         print("-------------KMeans-------------")
         newster.find_clusters(method = "kmeans", n_clusters = 6)
         newster.print_clusters()
+        print(newster.get_common_tags())
         print("--------------Ward---------------")
         newster.find_clusters(method = "ward", n_clusters = 6)
         newster.print_clusters()
