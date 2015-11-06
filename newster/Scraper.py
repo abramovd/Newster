@@ -89,7 +89,7 @@ class Scraper:
                 print('------------------------')
         
     
-    def get_result_by_field(self, field):
+    def get_result_by_field(self, field, search_articles = 0, source = ''):
         """
         Return result stored by given JSON field for every news
         Args:
@@ -100,7 +100,13 @@ class Scraper:
         result = []
         if field in self.fields():
             for news in self.json:
-                result.append(news[field])
+                if search_articles:
+                    if source == 'NYT' and news['snippet'] != None:
+                        result.append(news[field])
+                    elif source == 'GUARD' and news['webTitle'] != None:
+                        result.append(news[field])
+                elif news[field] != None:
+                    result.append(news[field])
         else:
             print('Sorry, JSON does not have field ' + field)
         return result
@@ -130,36 +136,53 @@ def search_articles(URLs, keys, query):
                 return {'snippets': [], 'sources': [], 'links': [], 'titles': []}
             if URLs[i].find('nytimes') != -1:
                 c = 'snippet'
-                result['links'] += scrapers[i].get_result_by_field('web_url')
-                titles = scrapers[i].get_result_by_field('headline')
+                src = 'NYT'
+                result['links'] += scrapers[i].get_result_by_field('web_url',
+                search_articles = 1, source = src)
+                titles = scrapers[i].get_result_by_field('headline', search_articles = 1, source = src)
                 result['titles'] += [title['main'] for title in titles]
-                result['sources'] += ['NYT'] * len(scrapers[i].get_result_by_field('source'))
+                result['sources'] += ['NYT'] * len(scrapers[i].get_result_by_field('source',
+                search_articles = 1, source = src))
             elif URLs[i].find('guard') != -1:
                 c = 'webTitle'
-                result['links'] += scrapers[i].get_result_by_field('webUrl')
-                result['titles'] += scrapers[i].get_result_by_field(c)
-                result['sources'] += ['GUARD'] * len(scrapers[i].get_result_by_field('webUrl'))
+                src = 'GUARD'
+                result['links'] += scrapers[i].get_result_by_field('webUrl', 
+                search_articles = 1, source = src)
+                result['titles'] += scrapers[i].get_result_by_field(c, search_articles = 1,
+                source = src)
+                result['sources'] += ['GUARD'] * len(scrapers[i].get_result_by_field('webUrl', 
+                search_articles = 1, source = src))
             else:
                 print("Sorry. Unknown API.")
-            result['snippets'] += scrapers[i].get_result_by_field(c)
+            result['snippets'] += scrapers[i].get_result_by_field(c, search_articles = 1,
+            source = src)
 
     elif type(URLs) is str and type(keys) is str: 
         scraper = Scraper(URLs, keys)
         if scraper.search(query) != urllib2.URLError:
             if URLs[i].find('nytimes') != -1:
+                src = 'NYT'
                 c = 'snippet'
-                result['links'] += scraper.get_result_by_field('web_url')
-                titles = scraper.get_result_by_field('headline')
+                result['links'] += scraper.get_result_by_field('web_url',
+                search_articles = 1, source = src)
+                titles = scraper.get_result_by_field('headline',
+                search_articles = 1, source = src)
                 result['titles'] += [title['main'] for title in titles]
-                result['sources'] += ['NYT'] * len(scraper.get_result_by_field('source'))
+                result['sources'] += ['NYT'] * len(scraper.get_result_by_field('source',
+                search_articles = 1, source = src))
             elif URLs[i].find('guard') != -1:
+                src = 'GUARD'
                 c = 'webTitle'
-                result['links'] += scraper.get_result_by_field('webUrl')
-                result['titles'] += scraper.get_result_by_field(c)
-                result['sources'] += ['GUARD'] * len(scraper.get_result_by_field('webUrl'))
+                result['links'] += scraper.get_result_by_field('webUrl',
+                search_articles = 1, source = src)
+                result['titles'] += scraper.get_result_by_field(c, search_articles = 1,
+                source = src)
+                result['sources'] += ['GUARD'] * len(scraper.get_result_by_field('webUrl',
+                search_articles = 1, source = src))
             else:
                 print("Sorry. Unknown API.")
-            result['snippets'] += scraper.get_result_by_field(c)
+            result['snippets'] += scraper.get_result_by_field(c, search_articles = 1,
+            source = src)
         else:
             return {'snippets': [], 'sources': [], 'links': [], 'titles': []}
     else:

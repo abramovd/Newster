@@ -296,7 +296,7 @@ def main():
     if len(snippets) == 0:
         print("Sorry, no results for your query!")
         return
-
+    
     STC = SuffixTreeClustering(snippets)
     #STC.add_strings(snippets)
     #STC.find_base_clusters() # finding base clusters

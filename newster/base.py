@@ -124,9 +124,13 @@ class Newster:
     
 
 def main():
-    query = "Obama"
+    query = "obama"
     newster = Newster(api_urls, api_keys, query)
     #newster.print_search_results()
+    #print(len(newster.get_snippets()))
+    #print(len(newster.get_titles()))
+    #print(len(newster.get_links()))
+    #print(len(newster.get_sources()))
     #newster.print_links()
     if len(newster.get_snippets()) > 0:
         print("--------------STC---------------")
