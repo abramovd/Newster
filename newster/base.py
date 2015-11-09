@@ -9,7 +9,7 @@ from algorithms.Ward import HierarchicalClustering
 from algorithms.STC import SuffixTreeClustering
 from algorithms.FCA import FCAClustering
 from algorithms.KMeans import kMeansClustering
-from scraper import Scraper, search_articles
+from Scraper import Scraper, search_articles
 from config import api_urls, api_keys
 
 NUM_OF_CLUSTERS = 6

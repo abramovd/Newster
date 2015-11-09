@@ -8,6 +8,7 @@ try:
 except ImportError:
     import urllib2
 
+
 class Scraper:
     """
         Class for scraping articles in JSON

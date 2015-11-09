@@ -9,7 +9,7 @@ import os.path, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 import copy
 
-from scraper import Scraper, search_articles
+from Scraper import Scraper, search_articles
 from fca.context import Context
 from fca.concept import Concept
 from fca.concept_lattice import ConceptLattice, compute_probability

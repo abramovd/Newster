@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.par
 
 import numpy as np
 from preprocessing.tokenize_and_stem import tokenize_and_stem
-from scraper import Scraper, search_articles
+from Scraper import Scraper, search_articles
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
