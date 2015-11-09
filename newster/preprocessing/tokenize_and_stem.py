@@ -1,9 +1,9 @@
 import re
+import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import wordpunct_tokenize
 from nltk.stem.lancaster import LancasterStemmer
 from nltk.stem.snowball import SnowballStemmer
-import nltk
 
 def tokenize_and_stem(text, stem = 1):
     """
