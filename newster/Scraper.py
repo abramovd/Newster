@@ -71,7 +71,7 @@ class Scraper:
            List of strings where every element is a field in JSON
            or just one string to print only one field
         """
-        if fields is list:
+        if isinstance(fields, list):
             for field in fields:
                 if field not in self.fields():
                     print('Sorry, JSON does not have field ' + field + '.')
@@ -84,8 +84,8 @@ class Scraper:
                     print('------------------------')
         else:
             for i in range(len(self.json)):
-                print(field, end = ': ')
-                print(self.json[i][field])
+                print(fields, end = ': ')
+                print(self.json[i][fields])
                 print('------------------------')
         
     
