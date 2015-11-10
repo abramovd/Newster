@@ -126,6 +126,7 @@ class Newster:
 def main():
     query = "obama"
     newster = Newster(api_urls, api_keys, query)
+    
     #newster.print_search_results()
     #print(len(newster.get_snippets()))
     #print(len(newster.get_titles()))
